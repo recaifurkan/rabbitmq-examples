@@ -48,7 +48,7 @@ public class RetryUtil {
             try {
                 return callable.call();
             } catch (Exception e) {
-                log.warn(message + " retry " + i + " failed, " + e.toString());
+                log.error(message + " retry " + i + " failed, " + e.toString());
                 if (i == maxRetries - 1) {
                     throw new RetryException(message + " retry " + i + " failed finally", e);
                 } else {
@@ -71,7 +71,7 @@ public class RetryUtil {
                 retryable.run();
                 return;
             } catch (Exception e) {
-                log.warn(message + " retry " + i + " failed, " + e.toString());
+                log.error(message + " retry " + i + " failed, " + e.toString());
                 if (i == maxRetries - 1) {
                     throw new RetryException(message + " retry " + i + " failed finally", e);
                 } else {
