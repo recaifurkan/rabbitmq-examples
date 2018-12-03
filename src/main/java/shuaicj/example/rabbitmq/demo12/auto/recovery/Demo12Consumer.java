@@ -9,6 +9,7 @@ import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import lombok.extern.slf4j.Slf4j;
+import shuaicj.retry.RetryUtil;
 
 /**
  * See http://www.rabbitmq.com/api-guide.html#recovery.
