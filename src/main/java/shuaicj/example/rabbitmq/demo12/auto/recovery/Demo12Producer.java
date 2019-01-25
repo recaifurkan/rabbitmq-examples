@@ -18,7 +18,7 @@ public class Demo12Producer {
 
     private static final String Q = "demo12-queue";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         ConnectionFactory factory = new ConnectionFactory();
         Address[] addresses = Address.parseAddresses(CONN_STRING);
         Connection connection = RetryUtil.retry("new connection", () -> factory.newConnection(addresses));
@@ -34,24 +34,16 @@ public class Demo12Producer {
             RetryUtil.retryForever("publish",
                     () -> channel.basicPublish("", Q, MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes()));
             log.info("Message sent: " + message);
-            sleep();
+            Thread.sleep(1000);
             boolean confirmOk = RetryUtil.retryForever("wait confirm", () -> channel.waitForConfirms());
             log.info("Confirm ok: " + confirmOk);
             if (!confirmOk) {
                 log.error("confirm not ok, this should not happen");
             }
-            sleep();
+            Thread.sleep(1000);
         }
 
         RetryUtil.retry("channel close", () -> channel.close());
         RetryUtil.retry("connection close", () -> connection.close());
-    }
-
-    private static void sleep() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }

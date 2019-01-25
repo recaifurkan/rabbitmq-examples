@@ -21,7 +21,7 @@ public class Demo12Consumer {
 
     private static final String Q = "demo12-queue";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         ConnectionFactory factory = new ConnectionFactory();
         Address[] addresses = Address.parseAddresses(CONN_STRING);
         Connection connection = RetryUtil.retry("new connection", () -> factory.newConnection(addresses));
@@ -37,7 +37,7 @@ public class Demo12Consumer {
                 try {
                     doWork(body);
                 } finally {
-                    RetryUtil.retryForever("ack", () -> getChannel().basicAck(envelope.getDeliveryTag(), false));
+                    ack(channel, envelope);
                 }
             }
         };
@@ -55,5 +55,13 @@ public class Demo12Consumer {
             e.printStackTrace();
         }
         log.info("Work done! " + message);
+    }
+
+    private static void ack(Channel channel, Envelope envelope) {
+        try {
+            RetryUtil.retryForever("ack", () -> channel.basicAck(envelope.getDeliveryTag(), false));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
