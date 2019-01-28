@@ -1,5 +1,7 @@
 package shuaicj.example.rabbitmq.demo12.auto.recovery;
 
+import java.io.IOException;
+
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Address;
 import com.rabbitmq.client.Channel;
@@ -33,11 +35,13 @@ public class Demo12Consumer {
         Consumer consumer = new DefaultConsumer(channel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope,
-                                       AMQP.BasicProperties properties, byte[] body) {
+                                       AMQP.BasicProperties properties, byte[] body) throws IOException {
                 try {
                     doWork(body);
                 } finally {
-                    ack(channel, envelope);
+                    // basicAck or basicReject can be executed only once, or an exception will be thrown occasionally
+                    // saying "unknown deliveryTag".
+                    channel.basicAck(envelope.getDeliveryTag(), false);
                 }
             }
         };
@@ -55,13 +59,5 @@ public class Demo12Consumer {
             e.printStackTrace();
         }
         log.info("Work done! " + message);
-    }
-
-    private static void ack(Channel channel, Envelope envelope) {
-        try {
-            RetryUtil.retryForever("ack", () -> channel.basicAck(envelope.getDeliveryTag(), false));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }

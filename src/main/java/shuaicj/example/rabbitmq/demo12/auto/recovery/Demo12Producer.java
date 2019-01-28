@@ -35,6 +35,8 @@ public class Demo12Producer {
                     () -> channel.basicPublish("", Q, MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes()));
             log.info("Message sent: " + message);
             Thread.sleep(1000);
+
+            // waitForConfirms can be executed more than once
             boolean confirmOk = RetryUtil.retryForever("wait confirm", () -> channel.waitForConfirms());
             log.info("Confirm ok: " + confirmOk);
             if (!confirmOk) {
