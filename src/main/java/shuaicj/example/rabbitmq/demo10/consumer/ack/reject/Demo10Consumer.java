@@ -65,6 +65,10 @@ public class Demo10Consumer {
             }
         };
 
+        channel1.basicQos(1);
+        channel2.basicQos(1);
+        channel3.basicQos(1);
+
         boolean autoAck = false;
         channel1.basicConsume(Q, autoAck, consumer1);
         channel2.basicConsume(Q, autoAck, consumer2);
